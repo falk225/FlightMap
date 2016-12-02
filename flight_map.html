@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>"Flight Map from 1987"</title>
+    <meta charset="utf-8">
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="flight_map.css">
+    <script src = "flight_map.js"></script>
+</head>
+<body>
+    <script type="text/javascript">
+    /*
+    Use D3 to load the GeoJSON file
+    */
+
+        d3.json("world_countries.json", draw_map);
+    </script>
+</body>
+</html>
