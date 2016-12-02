@@ -18,6 +18,9 @@ function draw_map(geo_data) {
     var map= svg.append('g')
         .attr('class', 'map');
 
+    //var projection= d3.geo.mercator()
+    //                    .scale(100)
+                        //.translate(1,1);
     var projection = d3.geo.albersUsa()
                            .scale(1000);
                            //.translate( [0, 0]);
@@ -34,26 +37,27 @@ function draw_map(geo_data) {
         .style('stroke-width', 0.5);
 
     function plot_airports(flight_data) {
-        //restricts to continental US
+        //filters to continental US plus alasaka and hawaii
         var filtered = flight_data.filter(function(d) {
-                        return (d.OrigLong>-126 &&
+                        return (d.OrigLong>-172 &&
                             d.OrigLong <-63 &&
-                            d.OrigLat>24 &&
-                            d.OrigLat<50);
+                            d.OrigLat>19 &&
+                            d.OrigLat<72);
                     });
 
         svg.append('g')
             .attr('class','airports')
             .selectAll('circle')
             .data(filtered)
+            //.data(flight_data)
             .enter()
             .append('circle')
             .attr('r',5)
             .attr('cx', function(d){
-                return projection([d.OrigLong, d.OrigLat])[0]
+                return projection([d.OrigLong, d.OrigLat])[0];
             })
             .attr('cy', function(d){
-                return projection([d.OrigLong, d.OrigLat])[1]
+                return projection([d.OrigLong, d.OrigLat])[1];
             });
     }
 
