@@ -49,12 +49,13 @@ function draw_map(geo_data) {
 
             svg.append('g')
                 .attr('class','airports')
-                .selectAll('circle')
+                .selectAll('ellipse')
                 .data(filtered)
                 //.data(flight_data)
                 .enter()
-                .append('circle')
-                .attr('r',5)
+                .append('ellipse')
+                .attr('rx',5)
+                .attr('ry',2)
                 .attr('cx', function(d){
                     return projection([d.values.long, d.values.lat])[0];
                 })
@@ -62,6 +63,10 @@ function draw_map(geo_data) {
                     return projection([d.values.long, d.values.lat])[1];
                 });
         };
+
+        function plot_bars(bar_data, isOrigin){
+
+        }
         /*
         var ap_codes = [];
         var airports=[];
@@ -88,7 +93,20 @@ function draw_map(geo_data) {
                     'long' : long,
                     'lat' : lat
                     };
-        }
+        };
+
+        function groupby_dest(data){
+            var n = d3.sum(data,function(d){
+                            return d['n'];
+                        });
+            var long = data[0].DestLong;
+            var lat = data[0].DestLat;
+            return {
+                    'n' : n,
+                    'long' : long,
+                    'lat' : lat
+                    };
+        };
 
         var orig_airports = d3.nest()
                     .key(function(d) {
@@ -96,9 +114,16 @@ function draw_map(geo_data) {
                     })
                     .rollup(groupby_orig)
                     .entries(flight_data);
-        //console.log(orig_airports[0]);
 
-        plot_airports(orig_airports);
+        var dest_airports = d3.nest()
+                    .key(function(d) {
+                        return d.Dest;
+                    })
+                    .rollup(groupby_dest)
+                    .entries(flight_data);
+
+
+        plot_airports(dest_airports);
     }
 
     d3.csv("flight_data.csv", populate_map);
