@@ -2,4 +2,4 @@ draw map
 filter by hour
 for each hour
 	plot airports
-		size airports based on incoming flights to that airport
+		add bars to airports two bars sized by departing and arriving flight numbers
