@@ -54,7 +54,7 @@ function draw_map(geo_data) {
                 //.data(flight_data)
                 .enter()
                 .append('ellipse')
-                .attr('rx',5)
+                .attr('rx',6)
                 .attr('ry',2)
                 .attr('cx', function(d){
                     return projection([d.values.long, d.values.lat])[0];
@@ -65,7 +65,33 @@ function draw_map(geo_data) {
         };
 
         function plot_bars(bar_data, isOrigin){
+            if (isOrigin) {
+                var name='origin';
+                var adj= -5;
+            } else {
+                var name='dest';
+                var adj= 1;
+            };
 
+            svg.append('g')
+                .attr('class',name)
+                .selectAll('rect')
+                .data(bar_data)
+                .enter()
+                .append('rect')
+                .attr('class', name+'_bar')
+                .attr('x',function(d){
+                    //console.log([d.values.long, d.values.lat])
+                    //console.log(projection([d.values.long, d.values.lat]));
+                    return adj + projection([d.values.long, d.values.lat])[0];
+                })
+                .attr('y', function(d){
+                    return projection([d.values.long, d.values.lat])[1] - bar_scale(d.values.n);
+                })
+                .attr('width', 5)
+                .attr('height', function(d){
+                    return bar_scale(d.values.n);
+                });
         }
         /*
         var ap_codes = [];
@@ -115,6 +141,13 @@ function draw_map(geo_data) {
                     .rollup(groupby_orig)
                     .entries(flight_data);
 
+        orig_airports = orig_airports.filter(function(d) {
+                            return (d.values.long > -172 &&
+                                d.values.long < -63 &&
+                                d.values.lat > 19 &&
+                                d.values.lat < 72);
+        });
+
         var dest_airports = d3.nest()
                     .key(function(d) {
                         return d.Dest;
@@ -122,8 +155,23 @@ function draw_map(geo_data) {
                     .rollup(groupby_dest)
                     .entries(flight_data);
 
+        dest_airports = dest_airports.filter(function(d) {
+                            return (d.values.long > -172 &&
+                                d.values.long < -63 &&
+                                d.values.lat > 19 &&
+                                d.values.lat < 72);
+        });
+
+        var bar_extent = d3.extent([].concat(orig_airports.map(function(item){return item.values.n;}),
+                                            dest_airports.map(function(item){return item.values.n;})));
+
+        var bar_scale = d3.scale.linear()
+                            .range([2,25])
+                            .domain(bar_extent);
 
         plot_airports(dest_airports);
+        plot_bars(orig_airports, true);
+        plot_bars(dest_airports, false);
     }
 
     d3.csv("flight_data.csv", populate_map);
