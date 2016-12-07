@@ -1,8 +1,35 @@
 ellipse{
     fill: none;
     stroke: black;
-    stroke-width: 0.7;
-    opacity: 0.7;
+    stroke-width: 0.7
+    opacity.7;
+}
+h1 {
+    position: absolute;
+    left:300px;
+    width:500px;
+}
+h2 {
+    position: absolute;
+    left:400px;
+    width:150px;
+    top:50px;
+}
+.button {
+    position: absolute;
+    top:70px;
+    width:50px;
+}
+.button-up{
+    left:600px;
+}
+.button-down{
+    left:550px;
+}
+svg {
+    position: absolute;
+    left:0px;
+    top:100px;
 }
 div.years_buttons {
     position: fixed;
@@ -16,7 +43,15 @@ div.years_buttons div {
 }
 .origin_bar {
     fill: blue;
+    stroke: black;
+    stroke-width:.1;
+    opacity:.7;
+    stroke-opacity: 1;
 }
 .dest_bar {
     fill: red;
+    stroke: black;
+    stroke-width:.1;
+    opacity:.7;
+    stroke-opacity: 1;
 }
