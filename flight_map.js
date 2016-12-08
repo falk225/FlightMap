@@ -11,7 +11,7 @@ function draw_map(geo_data) {
         .attr('align', 'center')
         .text('Flight Map 1987');
 
-    var currentHour=12;
+    var currentHour=1;
 
     function timeMsg(hour){
         if (hour>12) {
@@ -25,7 +25,8 @@ function draw_map(geo_data) {
     header.append('h2')
         .attr('class', 'time')
         .attr('align','center')
-        .text(timeMsg(currentHour));
+        .text(timeMsg(currentHour))
+        .style('opacity',0);
 
     var svg = body.append("svg")
         .attr("width", width + margin)
@@ -33,6 +34,17 @@ function draw_map(geo_data) {
 
     var map= svg.append('g')
         .attr('class', 'map');
+
+    header.insert('button', 'svg')
+        .attr('class', 'button button-down')
+        .text('<-')
+        .style('opacity',0);
+
+    header.insert('button', 'svg')
+        .attr('class', 'button button-up')
+        .text('->')
+        .style('opacity',0);
+
 
     //var projection= d3.geo.mercator()
     //                    .scale(100)
@@ -121,6 +133,7 @@ function draw_map(geo_data) {
             };
 
             d3.select('.time')
+                .style('opacity',1)
                 .text(timeMsg(hour));
 
             function projLongLat(d){
@@ -295,10 +308,11 @@ function draw_map(geo_data) {
             update_bars(dest_airports_by_hour, false, new_hour);
             populate_all_airports_by_hour(new_hour);
             update_airports(all_airports_by_hour);
+            currentHour=new_hour;
         }
 
         var hours_idx=0;
-        populate_hours(4,1);
+        populate_hours(1,24);
         var hour_interval=setInterval(function() {
             currentHour=hours[hours_idx];
             change_hour(0);
@@ -306,16 +320,25 @@ function draw_map(geo_data) {
             if(hours_idx >= hours.length) {
                 clearInterval(hour_interval);
 
-                header.insert('button', 'svg')
-                    .attr('class', 'button button-down')
-                    .text('<-')
-                    .on('click', change_hour(-1));
+                d3.select('.button-up')
+                    .on('click', function(){
+                        change_hour(1);
+                    })
+                    .transition()
+                    .duration(500)
+                    .ease('linear')
+                    .style('opacity',1);
 
-                header.insert('button', 'svg')
-                    .attr('class', 'button button-up')
-                    .text('->')
-                    .on('click', change_hour(1));
 
+                d3.select('.button-down')
+                    .on('click', function(){
+                        change_hour(-1);
+                    })
+                    .transition()
+                    .duration(500)
+                    .ease('linear')
+                    .style('opacity',1);
+;
             }
         },1000);
     }
