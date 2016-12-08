@@ -312,7 +312,7 @@ function draw_map(geo_data) {
         }
 
         var hours_idx=0;
-        populate_hours(1,24);
+        populate_hours(12,1);
         var hour_interval=setInterval(function() {
             currentHour=hours[hours_idx];
             change_hour(0);
@@ -329,7 +329,6 @@ function draw_map(geo_data) {
                     .ease('linear')
                     .style('opacity',1);
 
-
                 d3.select('.button-down')
                     .on('click', function(){
                         change_hour(-1);
@@ -338,7 +337,43 @@ function draw_map(geo_data) {
                     .duration(500)
                     .ease('linear')
                     .style('opacity',1);
-;
+
+                //select origin bars
+                d3.selectAll('.origin_bar')
+                    .on('click', function(clicked_bar){
+                        var flight_path_data=flight_data_filtered.filter(function(d){
+                            return (d.DepHour == currentHour &&
+                                d.Origin == clicked_bar.key);
+                        });
+
+                        var flight_path_json = [];
+                        flight_path_data.forEach(function(d){
+                            var linestring= {
+                                "type": "LineString",
+                                "coordinates":[
+                                    [d.OrigLong, d.OrigLat],
+                                    [d.DestLong, d.DestLat]
+                                ]
+                            };
+                            flight_path_json.push(linestring);
+                        });
+
+                        var flight_paths=svg.append('g')
+                            .attr('class','flight_paths');
+
+                        flight_paths.selectAll('path')
+                            .data(flight_path_json)
+                            .enter()
+                            .append('path')
+                            .attr('class', 'origin_path')
+                            .transition()
+                                .duration(500)
+                                .ease('linear')
+                                .attr('d', d3.geo.path().projection(projection););
+                    });
+                //add on click event
+                //filter to data set by hour and origin airport code
+                //plot paths
             }
         },1000);
     }

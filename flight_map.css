@@ -55,3 +55,9 @@ div.years_buttons div {
     opacity:.7;
     stroke-opacity: 1;
 }
+.origin_path {
+    fill:none;
+    stroke:blue;
+    stroke-width:.5;
+    stroke-opacity:.7;
+}
