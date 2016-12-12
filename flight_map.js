@@ -11,7 +11,7 @@ function draw_map(geo_data) {
         .attr('align', 'center')
         .text('Flight Map 1987');
 
-    var currentHour=1;
+    var currentHour=6;
 
     function timeMsg(hour){
         if (hour>12) {
@@ -35,20 +35,6 @@ function draw_map(geo_data) {
     var map= svg.append('g')
         .attr('class', 'map');
 
-    header.insert('button', 'svg')
-        .attr('class', 'button button-down')
-        .text('<-')
-        .style('opacity',0);
-
-    header.insert('button', 'svg')
-        .attr('class', 'button button-up')
-        .text('->')
-        .style('opacity',0);
-
-
-    //var projection= d3.geo.mercator()
-    //                    .scale(100)
-                        //.translate(1,1);
     var projection = d3.geo.albersUsa()
                            .scale(1000);
                            //.translate( [0, 0]);
@@ -60,13 +46,13 @@ function draw_map(geo_data) {
         .enter()
         .append('path')
         .attr('d', path)
-        .style('fill', 'lightBlue')
-        .style('stroke', 'black')
-        .style('stroke-width', 0.5);
+        .attr('class','states');
+
+    var hour_interval; //used to play 24h
 
     function populate_map(flight_data) {
         //filters to continental US plus alasaka and hawaii
-        var flight_data_filtered=flight_data.filter(function(d){
+        var flight_data_on_map=flight_data.filter(function(d){
             return(d.OrigLong > -172 &&
                     d.OrigLong < -63 &&
                     d.OrigLat > 19 &&
@@ -188,6 +174,153 @@ function draw_map(geo_data) {
                 .each("end", function() {
                     d3.select(this).remove();
                 });
+
+            //add flight paths event
+
+
+
+            //add path drawing click event
+            svg.select('.bars')
+                .selectAll('rect.'+name+'_bar')
+                .on('click', function(clicked_bar){
+                    var previous_paths = d3.selectAll('.flight_paths.' + name + '.' + clicked_bar.key);
+                    //if paths are not already drawn
+                    if(previous_paths[0].length===0){
+                        draw_flight_paths(flight_data_on_map, isOrigin, clicked_bar.key, hour)
+                    //if paths are already drawn
+                    } else {
+                        previous_paths.remove()
+                    }
+
+                });
+                //.on("mouseover", mapMouseOver)
+                //.on("mouseout", mapMouseOut);
+
+
+        }
+
+        function draw_flight_paths(flight_data, isOrigin, airport_code, hour){
+            //draws flight paths
+            function linkArc(d) {
+                var dx = d.target.x - d.source.x,
+                dy = d.target.y - d.source.y,
+                dr = Math.sqrt(dx * dx + dy * dy);
+                if(dx>0){
+                    var sweep_flag=1;
+                }else{
+                    var sweep_flag=0;
+                }
+                return "M" + d.source.x + "," + d.source.y + "A" + dr*2 + "," + dr*2 + " 0 0,"+sweep_flag + d.target.x + "," + d.target.y;
+            }
+
+            //departures
+            if (isOrigin){
+                var name='origin';
+                var adj=-3;
+                var ease='sin-out';
+                var flight_path_data=flight_data.filter(function(d){
+                    return (d.DepHour == hour &&
+                        d.Origin == airport_code);
+                });
+            } else { //arrivals
+                var name='dest';
+                var adj=3;
+                var ease='sin-in';
+                var flight_path_data=flight_data.filter(function(d){
+                    return (d.ArrHour == hour &&
+                        d.Dest == airport_code);
+                });
+            }
+            var flight_arcs = [];
+
+            flight_path_data.forEach(function(d){
+                var source_coord=projection([d.OrigLong, d.OrigLat]);
+                var target_coord=projection([d.DestLong, d.DestLat]);
+
+                var arc_def= {
+                    "source":{
+                        "x":source_coord[0]+adj,
+                        "y":source_coord[1]
+                    },
+                    "target":{
+                        "x":target_coord[0]+adj,
+                        "y":target_coord[1]
+                    },
+                    "n": d.n
+                };
+                flight_arcs.push(arc_def);
+            });
+
+            var flight_paths=svg.append('g')
+                .attr('class','flight_paths ' + name + ' ' + airport_code);
+
+            var paths = flight_paths.selectAll('path')
+                .data(flight_arcs)
+                .enter()
+                .append('path')
+                .attr('class', name + '_path')
+                .attr('d', linkArc)
+                .each(function(d){
+                    d.totalLength=this.getTotalLength();
+                })
+                .attr("stroke-dasharray", function(d) { return d.totalLength + " " + d.totalLength; })
+                .attr("stroke-dashoffset", function(d) { return d.totalLength; })
+                .attr("stroke-width",function(d){return flight_path_scale(d.n);})
+                .transition()
+                .duration(1000)
+                .ease(ease)
+                .attr('stroke-dashoffset', 0)
+                .each('start', function(d){
+                    var this_path=this;
+                    var circles=flight_paths.append('circle')
+                    .attr('class', name + '_marker')
+                    .attr('r',flight_marker_scale(d.n))
+                    .attr("transform", function () {
+                        return"translate(" + d.source.x + "," + d.source.y + ")";
+                    })
+
+                    if(isOrigin==false){
+                        flight_paths.append('circle')
+                        .attr('class', name + '_marker')
+                        .attr('r',flight_marker_scale(d.n))
+                        .attr("transform", function () {
+                            return"translate(" + d.source.x + "," + d.source.y + ")";
+                        });
+
+                        circles.transition()
+                            .ease(ease)
+                            .duration(1000)
+                            .style('opacity',.01)
+                            .attrTween("transform", translateAlong(this_path))
+                            .each('end',function(){d3.select(this).remove();});
+                    } else {
+                        circles.transition()
+                            .ease(ease)
+                            .duration(1000)
+                            .attrTween("transform", translateAlong(this_path));
+                    }
+                });
+
+                function translateAlong(path) {
+                    var l = path.getTotalLength();
+                    return function(d, i, a) {
+                        return function(t) {
+                            var p = path.getPointAtLength(t * l);
+                            return "translate(" + p.x + "," + p.y + ")";
+                        };
+                    };
+                }
+        }
+
+        function update_existing_flight_paths(hour){
+            var existing_paths=d3.selectAll('.flight_paths')[0];
+            if (existing_paths.length!=0){
+                existing_paths.forEach(function(existing_path){
+                    var path_classes=existing_path.classList;
+                    d3.selectAll('.flight_paths.' + path_classes[1] + '.' + path_classes[2]).remove();
+                    draw_flight_paths(flight_data_on_map, path_classes[1]=='origin', path_classes[2], hour)
+                });
+            }
         }
 
         function groupby_orig(data){
@@ -250,7 +383,7 @@ function draw_map(geo_data) {
                         return d.Origin;
                     })
                     .rollup(groupby_orig)
-                    .entries(flight_data_filtered);
+                    .entries(flight_data_on_map);
 
         var dest_airports_by_hour = d3.nest()
                     .key(function (d) {
@@ -260,7 +393,7 @@ function draw_map(geo_data) {
                         return d.Dest;
                     })
                     .rollup(groupby_dest)
-                    .entries(flight_data_filtered);
+                    .entries(flight_data_on_map);
 
         var n_values=[]
         orig_airports_by_hour.forEach(function(airports_hour){
@@ -276,10 +409,21 @@ function draw_map(geo_data) {
         });
 
         var bar_extent = d3.extent(n_values);
-
         var bar_scale = d3.scale.linear()
                             .range([1,50])
                             .domain(bar_extent);
+
+        var flight_path_ns=[];
+        flight_data_on_map.forEach(function(d){
+            flight_path_ns.push(d.n);
+        });
+        var flight_path_extent=d3.extent(flight_path_ns);
+        var flight_path_scale= d3.scale.linear()
+                                    .range([.05,.8])
+                                    .domain(flight_path_extent);
+        var flight_marker_scale=d3.scale.linear()
+                                    .range([.5,5])
+                                    .domain(flight_path_extent);
 
         var hours = [];
 
@@ -308,74 +452,52 @@ function draw_map(geo_data) {
             update_bars(dest_airports_by_hour, false, new_hour);
             populate_all_airports_by_hour(new_hour);
             update_airports(all_airports_by_hour);
+            update_existing_flight_paths(new_hour);
             currentHour=new_hour;
         }
 
-        var hours_idx=0;
-        populate_hours(12,1);
-        var hour_interval=setInterval(function() {
-            currentHour=hours[hours_idx];
-            change_hour(0);
-            hours_idx++;
-            if(hours_idx >= hours.length) {
+        function play24(){
+            var hours_idx=0;
+            populate_hours(currentHour,24);
+            hour_interval=setInterval(function() {
+                currentHour=hours[hours_idx];
+                change_hour(0);
+                hours_idx++;
+                if(hours_idx >= hours.length) {
+                    clearInterval(hour_interval);
+                    d3.select('.play24').text('Play 24h');
+                }
+            },1500);
+        }
+    header.insert('button', 'svg')
+        .attr('class', 'button play24')
+        .style('width','100px')
+        .text('Play 24h')
+        .on('click', function(){
+            var myButton=d3.select(this);
+            if(myButton.text()==='Stop'){
                 clearInterval(hour_interval);
-
-                d3.select('.button-up')
-                    .on('click', function(){
-                        change_hour(1);
-                    })
-                    .transition()
-                    .duration(500)
-                    .ease('linear')
-                    .style('opacity',1);
-
-                d3.select('.button-down')
-                    .on('click', function(){
-                        change_hour(-1);
-                    })
-                    .transition()
-                    .duration(500)
-                    .ease('linear')
-                    .style('opacity',1);
-
-                //select origin bars
-                d3.selectAll('.origin_bar')
-                    .on('click', function(clicked_bar){
-                        var flight_path_data=flight_data_filtered.filter(function(d){
-                            return (d.DepHour == currentHour &&
-                                d.Origin == clicked_bar.key);
-                        });
-
-                        var flight_path_json = [];
-                        flight_path_data.forEach(function(d){
-                            var linestring= {
-                                "type": "LineString",
-                                "coordinates":[
-                                    [d.OrigLong, d.OrigLat],
-                                    [d.DestLong, d.DestLat]
-                                ]
-                            };
-                            flight_path_json.push(linestring);
-                        });
-
-                        var flight_paths=svg.append('g')
-                            .attr('class','flight_paths');
-
-                        flight_paths.selectAll('path')
-                            .data(flight_path_json)
-                            .enter()
-                            .append('path')
-                            .attr('class', 'origin_path')
-                            .transition()
-                                .duration(500)
-                                .ease('linear')
-                                .attr('d', d3.geo.path().projection(projection););
-                    });
-                //add on click event
-                //filter to data set by hour and origin airport code
-                //plot paths
+                myButton.text('Play 24h');
+            } else {
+                myButton.text('Stop');
+                play24();
             }
-        },1000);
+        });
+
+    header.insert('button', 'svg')
+        .attr('class', 'button button-down')
+        .text('<-')
+        .on('click', function(){
+            change_hour(-1);
+        });
+
+    header.insert('button', 'svg')
+        .attr('class', 'button button-up')
+        .text('->')
+        .on('click', function(){
+            change_hour(1);
+        });
+    change_hour(0);
     }
 
     d3.csv("flight_data.csv", populate_map);

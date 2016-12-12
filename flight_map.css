@@ -21,15 +21,23 @@ h2 {
     width:50px;
 }
 .button-up{
-    left:600px;
+    left:700px;
 }
 .button-down{
+    left:650px;
+}
+.play24{
     left:550px;
 }
 svg {
     position: absolute;
     left:0px;
     top:100px;
+}
+.states{
+    fill: #ccc;
+    stroke: #fff;
+    stroke-width:2px;
 }
 div.years_buttons {
     position: fixed;
@@ -42,22 +50,34 @@ div.years_buttons div {
     margin: 7px;
 }
 .origin_bar {
-    fill: blue;
+    fill: rgb(31, 28, 219);
     stroke: black;
     stroke-width:.1;
-    opacity:.7;
+    opacity:.9;
     stroke-opacity: 1;
 }
 .dest_bar {
-    fill: red;
+    fill: rgb(224, 24, 24);
     stroke: black;
     stroke-width:.1;
-    opacity:.7;
+    opacity:.9;
     stroke-opacity: 1;
 }
 .origin_path {
     fill:none;
-    stroke:blue;
-    stroke-width:.5;
+    stroke:rgb(31, 28, 219);
     stroke-opacity:.7;
+}
+.dest_path {
+    fill:none;
+    stroke:rgb(224, 24, 24);
+    stroke-opacity:.7;
+}
+.origin_marker {
+    fill:rgb(31, 28, 219);
+    opacity:.5;
+}
+.dest_marker {
+    fill:rgb(224, 24, 24);
+    opacity:.5;
 }
