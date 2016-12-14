@@ -53,14 +53,14 @@ div.years_buttons div {
     fill: rgb(31, 28, 219);
     stroke: black;
     stroke-width:.1;
-    opacity:.9;
+    opacity:.7;
     stroke-opacity: 1;
 }
 .dest_bar {
     fill: rgb(224, 24, 24);
     stroke: black;
     stroke-width:.1;
-    opacity:.9;
+    opacity:.7;
     stroke-opacity: 1;
 }
 .origin_path {
