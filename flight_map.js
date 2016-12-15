@@ -419,9 +419,9 @@ function draw_map(geo_data) {
         });
         var flight_path_extent=d3.extent(flight_path_ns);
         var flight_path_scale= d3.scale.linear()
-                                    .range([.05,.8])
+                                    .range([.05,1])
                                     .domain(flight_path_extent);
-        var flight_marker_scale=d3.scale.linear()
+        var flight_marker_scale=d3.scale.sqrt()
                                     .range([.5,5])
                                     .domain(flight_path_extent);
 
