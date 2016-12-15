@@ -14,12 +14,15 @@ function draw_map(geo_data) {
     var currentHour=6;
 
     function timeMsg(hour){
-        if (hour>12) {
-            var time_msg = hour-12 +":00 PM";
-        } else {
-            var time_msg=  hour + ":00 AM";
-        };
-        return time_msg;
+        function write_time(hour){
+            if (hour==12) {return "12 Noon";}
+            if (hour==0 || hour==24) {return "Midnight";}
+            if (hour>12) {return hour-12 +":00 PM";
+            } else {
+                return hour + ":00 AM";
+            }
+        }
+        return write_time(hour) + " - " +write_time(hour+1);
     }
 
     header.append('h2')
@@ -69,11 +72,86 @@ function draw_map(geo_data) {
         svg.append('g')
                 .attr('class','bars');
 
+        var tip=body.append('div')
+            .attr('class','tooltip');
+        tip.append('div')
+            .attr('class', 'tooltip-header');
+        var tip_body=tip.append('div')
+            .attr('class', 'tooltip-body');
+        tip_body.append('div')
+            .attr('class', 'tooltip-left');
+        tip_body.append('div')
+            .attr('class', 'tooltip-right');
+
+
+
+        function show_tooltip(airport_code){
+            var n_dep= orig_airports_by_hour.find(function(d){
+                return d.key==currentHour;
+            }).values.find(function(d){
+                return d.key==airport_code;
+            });
+            if (n_dep===undefined){
+                n_dep=0;
+            } else {
+                n_dep=n_dep.values.n;
+            }
+
+            var n_arr= dest_airports_by_hour.find(function(d){
+                return d.key==currentHour;
+            }).values.find(function(d){
+                return d.key==airport_code;
+            });
+            if (n_arr===undefined){
+                n_arr=0;
+            } else {
+                n_arr=n_arr.values.n;
+            }
+
+            tip.style("left", (d3.event.pageX + 20) + "px")
+                .style("top", (d3.event.pageY - 50) + "px");
+
+            tip.select('.tooltip-header')
+                .html( airport_code + "<br/>" + timeMsg(currentHour));
+            tip.select('.tooltip-left')
+                .html("Departures: <br/>" + n_dep);
+            tip.select('.tooltip-right')
+                .html("Arrivals: <br/>" + n_arr);
+            tip.transition()
+                .duration(250)
+                .style("opacity", .9);
+        }
+
         function update_airports(airport_data) {
             var airports= svg.select('.airports')
                 .selectAll('ellipse')
                 .data(airport_data, function key_func(d){
                     return d.key;
+                });
+
+
+            svg.select('.airports')
+                .selectAll('circle')
+                .data(airport_data, function key_func(d){
+                    return d.key;
+                })
+                .enter()
+                .append('circle')
+                .attr('r',10)
+                .style('opacity',0)
+                .attr('cx', function(d){
+                    return projection([d.long, d.lat])[0];
+                })
+                .attr('cy', function(d){
+                    return projection([d.long, d.lat])[1] - 1;
+                })
+                .on("mouseover", function(d) {
+                    show_tooltip(d.key);
+                })
+                .on("mouseout", function(d) {
+                    tip.transition()
+                        .duration(250)
+                        .style("opacity", 0);
                 });
 
             airports.enter()

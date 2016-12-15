@@ -11,13 +11,13 @@ h1 {
 }
 h2 {
     position: absolute;
-    left:400px;
-    width:150px;
+    left:325px;
+    width:225px;
     top:50px;
 }
 .button {
     position: absolute;
-    top:70px;
+    top:72.5px;
     width:50px;
 }
 .button-up{
@@ -80,4 +80,32 @@ div.years_buttons div {
 .dest_marker {
     fill:rgb(224, 24, 24);
     opacity:.5;
+}
+.tooltip {
+    position: absolute;
+    text-align: center;
+    width: 150px;
+    height: 60px;
+    padding: 4px;
+    font: 12px sans-serif;
+    background: #ccc;;
+    border: solid #fff;
+    border-radius: 8px;
+    border-width:2px;
+    pointer-events: none;
+    opacity: 0;
+
+}
+.tooltip-header{
+    height:30px;
+}
+.tooltip-left{
+    float:left;
+
+
+}
+.tooltip-right{
+    float: right;
+
+
 }

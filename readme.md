@@ -24,3 +24,5 @@ Example of animating path drawing:
     http://bl.ocks.org/duopixel/4063326
 Example showing how to move a marker along a path:
     https://bl.ocks.org/mbostock/1705868
+Tooltips
+    http://bl.ocks.org/d3noob/a22c42db65eb00d4e369
