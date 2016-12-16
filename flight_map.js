@@ -5,15 +5,22 @@ function draw_map(geo_data) {
         height = 600 - margin;
 
     var body =d3.select("body");
+
     var header = body.append('div')
+                    .attr('class','header');
+
+    //add title
     header.append('h1')
         .attr('class', 'map_title')
         .attr('align', 'center')
         .text('Flight Map 1987');
 
+    //set hour the map start with (0-23)
     var currentHour=6;
 
     function timeMsg(hour){
+    //Input: integer 0-24
+    //Output: formatted time string e.g. 6:00 AM - 7:00 AM
         function write_time(hour){
             if (hour==12) {return "12 Noon";}
             if (hour==0 || hour==24) {return "Midnight";}
@@ -25,6 +32,7 @@ function draw_map(geo_data) {
         return write_time(hour) + " - " +write_time(hour+1);
     }
 
+    //shows time
     header.append('h2')
         .attr('class', 'time')
         .attr('align','center')
@@ -35,15 +43,17 @@ function draw_map(geo_data) {
         .attr("width", width + margin)
         .attr("height", height + margin);
 
+    //container for state paths
     var map= svg.append('g')
         .attr('class', 'map');
 
     var projection = d3.geo.albersUsa()
-                           .scale(1000);
-                           //.translate( [0, 0]);
+                           .scale(1300)
+                           .translate([(width+margin)/2,(height+margin)/2]);
 
     var path = d3.geo.path().projection(projection);
 
+    //draw states
     map.selectAll('path')
         .data(geo_data.features)
         .enter()
@@ -72,6 +82,7 @@ function draw_map(geo_data) {
         svg.append('g')
                 .attr('class','bars');
 
+        //structure of tooltip to be populated on mouseover
         var tip=body.append('div')
             .attr('class','tooltip');
         tip.append('div')
@@ -92,8 +103,8 @@ function draw_map(geo_data) {
             return projection([d.values.long, d.values.lat]);
         }
 
-
         function show_tooltip(airport_code){
+            //get number of departures for this airport and hour
             var n_dep= orig_airports_by_hour.find(function(d){
                 return d.key==currentHour;
             }).values.find(function(d){
@@ -105,6 +116,7 @@ function draw_map(geo_data) {
                 n_dep=n_dep.values.n;
             }
 
+            //get number of arrivals for this airport and hour
             var n_arr= dest_airports_by_hour.find(function(d){
                 return d.key==currentHour;
             }).values.find(function(d){
@@ -116,16 +128,18 @@ function draw_map(geo_data) {
                 n_arr=n_arr.values.n;
             }
 
-            tip.style("left", (d3.event.pageX + 40) + "px")
-                .style("top", (d3.event.pageY - 50) + "px");
-
+            //populate tooltip data
             tip.select('.tooltip-header')
                 .html( airport_code + "<br/>" + timeMsg(currentHour));
             tip.select('.tooltip-left')
                 .html("Departures: <br/>" + n_dep);
             tip.select('.tooltip-right')
                 .html("Arrivals: <br/>" + n_arr);
-            tip.transition()
+
+            //show tooltip box
+            tip.style("left", (d3.event.pageX + 40) + "px")
+                .style("top", (d3.event.pageY - 50) + "px")
+                .transition()
                 .ease('linear')
                 .duration(250)
                 .style("opacity", .9);
@@ -175,6 +189,7 @@ function draw_map(geo_data) {
 
         function hide_tooltip(airport_code){
 
+            //hide tooltip box
             tip.transition()
                 .duration(250)
                 .ease('linear')
@@ -224,19 +239,22 @@ function draw_map(geo_data) {
         }
 
         function update_airports(airport_data) {
+            //plots ellipse to mark each airport
+
             var airports= svg.select('.airports')
                 .selectAll('ellipse')
                 .data(airport_data, function key_func(d){
                     return d.key;
                 });
 
-
+            //adds circle as a hitbox to make it easier to mouseover
             var airport_hitbox=svg.select('.airports')
                 .selectAll('circle')
                 .data(airport_data, function key_func(d){
                     return d.key;
                 });
 
+            //adds mouseover events to hitbox
             airport_hitbox.enter()
                 .append('circle')
                 .attr('r',10)
@@ -257,6 +275,7 @@ function draw_map(geo_data) {
             airport_hitbox.exit()
                 .remove();
 
+            //draws ellipse
             airports.enter()
                 .append('ellipse')
                 .attr('class', function(d) {return 'airport ' + d.key;})
@@ -280,6 +299,8 @@ function draw_map(geo_data) {
                 .attr('rx',6)
                 .attr('ry',2);
 
+
+            //removes ellipses for airports with no data for this hour
             airports.exit()
                 .transition()
                     .duration(500)
@@ -296,6 +317,8 @@ function draw_map(geo_data) {
             var bar_data_filtered= bar_data.find(function(d){
                 return d.key==hour;
             });
+
+            //used to set differnt positions and class names for origin and dest bars
             if (isOrigin) {
                 var name='origin';
                 var adj= -5.5;
@@ -304,6 +327,7 @@ function draw_map(geo_data) {
                 var adj= .5;
             };
 
+            //updates time header
             d3.select('.time')
                 .style('opacity',1)
                 .text(timeMsg(hour));
@@ -314,6 +338,7 @@ function draw_map(geo_data) {
                     return name+d.key;
                 });
 
+            //resize current bars
             bars.transition()
                 .ease('linear')
                 .duration(500)
@@ -324,6 +349,7 @@ function draw_map(geo_data) {
                     return projLongLat(d)[1] - bar_scale(d.values.n);
                 });
 
+            //add new bars
             bars.enter()
                 .append('rect')
                 .attr('class', function(d) {return name+'_bar ' + d.key;})
@@ -351,6 +377,7 @@ function draw_map(geo_data) {
                         return projLongLat(d)[1] - bar_scale(d.values.n);
                     });
 
+            //remove bars without any data this hour
             bars.exit()
                 .transition()
                     .duration(500)
@@ -363,11 +390,8 @@ function draw_map(geo_data) {
                     d3.select(this).remove();
                 });
 
-            //add flight paths event
-
-
-
-            //add path drawing click event
+            //click event draws paths if not already displayed
+            //removes paths if already drawn
             svg.select('.bars')
                 .selectAll('rect.'+name+'_bar')
                 .on('click', function(clicked_bar){
@@ -379,16 +403,12 @@ function draw_map(geo_data) {
                     } else {
                         previous_paths.remove()
                     }
-
                 });
-                //.on("mouseover", mapMouseOver)
-                //.on("mouseout", mapMouseOut);
-
-
         }
 
         function draw_flight_paths(flight_data, isOrigin, airport_code, hour){
-            //draws flight paths
+
+            //creates instructions for drawing arc
             function linkArc(d) {
                 var dx = d.target.x - d.source.x,
                 dy = d.target.y - d.source.y,
@@ -401,7 +421,7 @@ function draw_map(geo_data) {
                 return "M" + d.source.x + "," + d.source.y + "A" + dr*2 + "," + dr*2 + " 0 0,"+sweep_flag + d.target.x + "," + d.target.y;
             }
 
-            //departures
+            //departures paths settings
             if (isOrigin){
                 var name='origin';
                 var adj=-3;
@@ -410,7 +430,7 @@ function draw_map(geo_data) {
                     return (d.DepHour == hour &&
                         d.Origin == airport_code);
                 });
-            } else { //arrivals
+            } else { //arrivals paths setting
                 var name='dest';
                 var adj=3;
                 var ease='sin-in';
@@ -421,6 +441,7 @@ function draw_map(geo_data) {
             }
             var flight_arcs = [];
 
+            //populate array of arc paths
             flight_path_data.forEach(function(d){
                 var source_coord=projection([d.OrigLong, d.OrigLat]);
                 var target_coord=projection([d.DestLong, d.DestLat]);
@@ -442,6 +463,7 @@ function draw_map(geo_data) {
             var flight_paths=svg.append('g')
                 .attr('class','flight_paths ' + name + ' ' + airport_code);
 
+            //draw arcs
             var paths = flight_paths.selectAll('path')
                 .data(flight_arcs)
                 .enter()
@@ -459,6 +481,7 @@ function draw_map(geo_data) {
                 .ease(ease)
                 .attr('stroke-dashoffset', 0)
                 .each('start', function(d){
+                    //adds and animates marker along path
                     var this_path=this;
                     var circles=flight_paths.append('circle')
                     .attr('class', name + '_marker')
@@ -489,6 +512,7 @@ function draw_map(geo_data) {
                     }
                 });
 
+                //used by tween to move marker along arc
                 function translateAlong(path) {
                     var l = path.getTotalLength();
                     return function(d, i, a) {
@@ -501,6 +525,7 @@ function draw_map(geo_data) {
         }
 
         function update_existing_flight_paths(hour){
+            //redraw new paths for shown selections when hour changes
             var existing_paths=d3.selectAll('.flight_paths')[0];
             if (existing_paths.length!=0){
                 existing_paths.forEach(function(existing_path){
@@ -511,6 +536,7 @@ function draw_map(geo_data) {
             }
         }
 
+        //aggregation functions
         function groupby_orig(data){
             var n = d3.sum(data,function(d){
                             return d['n'];
@@ -563,6 +589,8 @@ function draw_map(geo_data) {
             });
         }
 
+        //this data has number of flights summed as n and is
+        //grouped by departure hour and origin airport
         var orig_airports_by_hour = d3.nest()
                     .key(function(d) {
                         return d.DepHour;
@@ -573,6 +601,8 @@ function draw_map(geo_data) {
                     .rollup(groupby_orig)
                     .entries(flight_data_on_map);
 
+        //this data has number of flights summed as n and is
+        //grouped by arrival hour and destination airport
         var dest_airports_by_hour = d3.nest()
                     .key(function (d) {
                         return d.ArrHour;
@@ -583,6 +613,7 @@ function draw_map(geo_data) {
                     .rollup(groupby_dest)
                     .entries(flight_data_on_map);
 
+        //combines all values into array for creating bar scale
         var n_values=[]
         orig_airports_by_hour.forEach(function(airports_hour){
             airports_hour.values.forEach(function(airport){
@@ -601,6 +632,7 @@ function draw_map(geo_data) {
                             .range([1,50])
                             .domain(bar_extent);
 
+        //combines all values into one array for flight path and marker scales
         var flight_path_ns=[];
         flight_data_on_map.forEach(function(d){
             flight_path_ns.push(d.n);
@@ -630,6 +662,8 @@ function draw_map(geo_data) {
         }
 
         function change_hour(increment){
+            //updates everything for a new hour that is increment hours from current
+
             var new_hour = currentHour+increment;
             if (new_hour>23){
                 new_hour=new_hour-24;
@@ -644,6 +678,7 @@ function draw_map(geo_data) {
             currentHour=new_hour;
         }
 
+        //plays through a whole day
         function play24(){
             var hours_idx=0;
             populate_hours(currentHour,24);
@@ -657,6 +692,7 @@ function draw_map(geo_data) {
                 }
             },1500);
         }
+    //play 24hr button
     header.insert('button', 'svg')
         .attr('class', 'button play24')
         .style('width','100px')
@@ -672,6 +708,7 @@ function draw_map(geo_data) {
             }
         });
 
+    //hour down button
     header.insert('button', 'svg')
         .attr('class', 'button button-down')
         .text('<-')
@@ -679,6 +716,7 @@ function draw_map(geo_data) {
             change_hour(-1);
         });
 
+    //hour up button
     header.insert('button', 'svg')
         .attr('class', 'button button-up')
         .text('->')
@@ -688,5 +726,6 @@ function draw_map(geo_data) {
     change_hour(0);
     }
 
+    //parses data from csv to run function populate_map
     d3.csv("flight_data.csv", populate_map);
 }
