@@ -1,7 +1,7 @@
 ellipse{
     fill: none;
     stroke: black;
-    stroke-width: 0.7
+    stroke-width: 0.7;
     opacity.7;
 }
 h1 {
@@ -38,16 +38,6 @@ svg {
     fill: #ccc;
     stroke: #fff;
     stroke-width:2px;
-}
-div.years_buttons {
-    position: fixed;
-    top: 5px;
-    left: 50px;
-}
-div.years_buttons div {
-    background-color: rgb(251, 201, 127);
-    padding: 3px;
-    margin: 7px;
 }
 .origin_bar {
     fill: rgb(31, 28, 219);
@@ -88,24 +78,19 @@ div.years_buttons div {
     height: 60px;
     padding: 4px;
     font: 12px sans-serif;
-    background: #ccc;;
+    background: #b3b3b3;
     border: solid #fff;
     border-radius: 8px;
     border-width:2px;
     pointer-events: none;
     opacity: 0;
-
 }
 .tooltip-header{
     height:30px;
 }
 .tooltip-left{
     float:left;
-
-
 }
 .tooltip-right{
     float: right;
-
-
 }

@@ -83,6 +83,14 @@ function draw_map(geo_data) {
         tip_body.append('div')
             .attr('class', 'tooltip-right');
 
+        //declared here so available in both hide and show tooltip
+        var grow_factor=4;
+        var ease_style='elastic';
+        var dur=500;
+
+        function projLongLat(d){
+            return projection([d.values.long, d.values.lat]);
+        }
 
 
         function show_tooltip(airport_code){
@@ -108,7 +116,7 @@ function draw_map(geo_data) {
                 n_arr=n_arr.values.n;
             }
 
-            tip.style("left", (d3.event.pageX + 20) + "px")
+            tip.style("left", (d3.event.pageX + 40) + "px")
                 .style("top", (d3.event.pageY - 50) + "px");
 
             tip.select('.tooltip-header')
@@ -118,8 +126,101 @@ function draw_map(geo_data) {
             tip.select('.tooltip-right')
                 .html("Arrivals: <br/>" + n_arr);
             tip.transition()
+                .ease('linear')
                 .duration(250)
                 .style("opacity", .9);
+
+            //grow ellipse
+            d3.select('.airport.' + airport_code)
+                .transition()
+                .duration(dur)
+                .ease(ease_style)
+                .attr('rx',6*grow_factor)
+                .attr('ry',2*grow_factor);
+
+            //grow origin bar
+            d3.select('.origin_bar.'+airport_code)
+                .transition()
+                .duration(dur)
+                .ease(ease_style)
+                .attr('x',function(d){
+                    return (-5.5*grow_factor) + projLongLat(d)[0];
+                })
+                .attr('width', 5*grow_factor)
+                .attr('height', function(d){
+                    return bar_scale(d.values.n)*grow_factor;
+                })
+                .attr('y', function(d){
+                    return projLongLat(d)[1] - (bar_scale(d.values.n)*grow_factor);
+                })
+                .style('opacity',1);
+
+            //grow dest bar
+            d3.select('.dest_bar.'+airport_code)
+                .transition()
+                .duration(dur)
+                .ease(ease_style)
+                .attr('x',function(d){
+                    return (.5*grow_factor) + projLongLat(d)[0];
+                })
+                .attr('width', 5*grow_factor)
+                .attr('height', function(d){
+                    return bar_scale(d.values.n)*grow_factor;
+                })
+                .attr('y', function(d){
+                    return projLongLat(d)[1] - (bar_scale(d.values.n)*grow_factor);
+                })
+                .style('opacity',1);
+        }
+
+        function hide_tooltip(airport_code){
+
+            tip.transition()
+                .duration(250)
+                .ease('linear')
+                .style("opacity", 0);
+
+            //shrink airport ellipse
+            d3.select('.airport.' + airport_code)
+                .transition()
+                .duration(dur)
+                .ease(ease_style)
+                .attr('rx',6)
+                .attr('ry',2);
+
+            //shrink origin bar
+            d3.select('.origin_bar.'+airport_code)
+                .transition()
+                .duration(dur)
+                .ease(ease_style)
+                .attr('x',function(d){
+                    return -5.5 + projLongLat(d)[0];
+                })
+                .attr('width', 5)
+                .attr('height', function(d){
+                    return bar_scale(d.values.n);
+                })
+                .attr('y', function(d){
+                    return projLongLat(d)[1] - bar_scale(d.values.n);
+                })
+                .style('opacity',0.7);
+
+            //shrink dest bar
+            d3.select('.dest_bar.'+airport_code)
+                .transition()
+                .duration(dur)
+                .ease(ease_style)
+                .attr('x',function(d){
+                    return .5 + projLongLat(d)[0];
+                })
+                .attr('width', 5)
+                .attr('height', function(d){
+                    return bar_scale(d.values.n);
+                })
+                .attr('y', function(d){
+                    return projLongLat(d)[1] - bar_scale(d.values.n);
+                })
+                .style('opacity',0.7);
         }
 
         function update_airports(airport_data) {
@@ -130,12 +231,13 @@ function draw_map(geo_data) {
                 });
 
 
-            svg.select('.airports')
+            var airport_hitbox=svg.select('.airports')
                 .selectAll('circle')
                 .data(airport_data, function key_func(d){
                     return d.key;
-                })
-                .enter()
+                });
+
+            airport_hitbox.enter()
                 .append('circle')
                 .attr('r',10)
                 .style('opacity',0)
@@ -149,13 +251,21 @@ function draw_map(geo_data) {
                     show_tooltip(d.key);
                 })
                 .on("mouseout", function(d) {
-                    tip.transition()
-                        .duration(250)
-                        .style("opacity", 0);
+                    hide_tooltip(d.key);
                 });
+
+            airport_hitbox.exit()
+                .remove();
 
             airports.enter()
                 .append('ellipse')
+                .attr('class', function(d) {return 'airport ' + d.key;})
+                .on("mouseover", function(d) {
+                    show_tooltip(d.key);
+                })
+                .on("mouseout", function(d) {
+                    hide_tooltip(d.key);
+                })
                 .attr('rx',0)
                 .attr('ry',0)
                 .attr('cx', function(d){
@@ -179,8 +289,6 @@ function draw_map(geo_data) {
                     .each("end", function() {
                         d3.select(this).remove();
                     });
-
-
         };
 
         function update_bars(bar_data, isOrigin, hour){
@@ -200,10 +308,6 @@ function draw_map(geo_data) {
                 .style('opacity',1)
                 .text(timeMsg(hour));
 
-            function projLongLat(d){
-                return projection([d.values.long, d.values.lat]);
-            }
-
             var bars= svg.select('.bars')
                 .selectAll('rect.'+name+'_bar')
                 .data(bar_data_filtered.values, function key_func(d){
@@ -222,7 +326,13 @@ function draw_map(geo_data) {
 
             bars.enter()
                 .append('rect')
-                .attr('class', name+'_bar')
+                .attr('class', function(d) {return name+'_bar ' + d.key;})
+                .on("mouseover", function(d) {
+                    show_tooltip(d.key);
+                })
+                .on("mouseout", function(d) {
+                    hide_tooltip(d.key);
+                })
                 .attr('x',function(d){
                     return adj + projLongLat(d)[0];
                 })
