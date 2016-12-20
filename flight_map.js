@@ -9,12 +9,6 @@ function draw_map(geo_data) {
     var header = body.append('div')
                     .attr('class','header');
 
-    //add title
-    header.append('h1')
-        .attr('class', 'map_title')
-        .attr('align', 'center')
-        .text('Flight Map 1987');
-
     //set hour the map start with (0-23)
     var currentHour=6;
 

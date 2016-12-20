@@ -4,20 +4,15 @@ ellipse{
     stroke-width: 0.7;
     opacity.7;
 }
-h1 {
-    position: absolute;
-    left:300px;
-    width:500px;
-}
-h2 {
+.time{
     position: absolute;
     left:325px;
     width:225px;
-    top:50px;
+    top:100px;
 }
 .button {
     position: absolute;
-    top:72.5px;
+    top:122.5px;
     width:50px;
 }
 .button-up{
@@ -32,7 +27,8 @@ h2 {
 svg {
     position: absolute;
     left:0px;
-    top:100px;
+    top:175px;
+    border: 1px solid black;
 }
 .states{
     fill: #ccc;
@@ -93,4 +89,22 @@ svg {
 }
 .tooltip-right{
     float: right;
+}
+p{
+    text-align:left;
+    margin: 0px;
+
+}
+#main-title{
+    margin-top: 20px;
+    font-size: 36px;
+}
+#sub-title{
+    font-size: 24px;
+}
+#description{
+    position: absolute;
+    font-size: 14px;
+    top:155px;
+    left:250px;
 }
