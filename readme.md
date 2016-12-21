@@ -29,7 +29,15 @@ Added invisible hit box around each airport to make activation of mouseover even
 Added mouseover event that shows a tool tip identifying the airport and the data for that hour behind that the bars represent.
 Added mouseover event that causes bars and ellipse to grow. This makes it obvious which markers the tooltip is referring to and also makes clicking on small data bars easier. It also makes it more fun to explore the map.
 
-#### Resources
+#### Feedback 3:
+Needs a description in header and title is too vauge.
+
+Needs a legend identifying what the blue bars and red bars mean.
+
+#### Updates 3:
+Changed title, added subtitle and instructions for use.
+
+### Resources
 Help on drawing arcs:
     http://stackoverflow.com/questions/17156283/d3-js-drawing-arcs-between-two-points-on-map-from-file
 Example of animating path drawing:

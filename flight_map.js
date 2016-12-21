@@ -34,6 +34,7 @@ function draw_map(geo_data) {
         .style('opacity',0);
 
     var svg = body.append("svg")
+        .attr('class','svg-map')
         .attr("width", width + margin)
         .attr("height", height + margin);
 

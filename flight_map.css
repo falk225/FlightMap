@@ -8,11 +8,11 @@ ellipse{
     position: absolute;
     left:325px;
     width:225px;
-    top:100px;
+    top:150px;
 }
 .button {
     position: absolute;
-    top:122.5px;
+    top:172.5px;
     width:50px;
 }
 .button-up{
@@ -24,11 +24,12 @@ ellipse{
 .play24{
     left:550px;
 }
-svg {
+.svg-map {
     position: absolute;
     left:0px;
-    top:175px;
+    top:210px;
     border: 1px solid black;
+    margin-left: 25px;
 }
 .states{
     fill: #ccc;
@@ -93,6 +94,7 @@ svg {
 p{
     text-align:left;
     margin: 0px;
+    padding-left: 25px;
 
 }
 #main-title{
@@ -103,8 +105,14 @@ p{
     font-size: 24px;
 }
 #description{
+    padding-left: 50px;
+    font-size: 18px;
+}
+.legend{
     position: absolute;
-    font-size: 14px;
-    top:155px;
-    left:250px;
+    left:800px;
+    top:225px;
+    border: 1px solid black;
+    height: 50px;
+    width: 100px;
 }
