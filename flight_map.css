@@ -113,6 +113,11 @@ p{
     left:800px;
     top:225px;
     border: 1px solid black;
-    height: 50px;
-    width: 100px;
+    height: 70px;
+    width: 115px;
+}
+.wrap{
+    height: 10px;
+    margin:auto;
+    padding:10px;
 }

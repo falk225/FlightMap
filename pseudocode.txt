@@ -1,5 +1,0 @@
-draw map
-filter by hour
-for each hour
-	plot airports
-		add bars to airports two bars sized by departing and arriving flight numbers
