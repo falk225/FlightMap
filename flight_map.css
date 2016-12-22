@@ -62,11 +62,11 @@ ellipse{
 }
 .origin_marker {
     fill:rgb(31, 28, 219);
-    opacity:.5;
+    opacity:.3;
 }
 .dest_marker {
     fill:rgb(224, 24, 24);
-    opacity:.5;
+    opacity:.3;
 }
 .tooltip {
     position: absolute;
@@ -106,18 +106,22 @@ p{
 }
 #description{
     padding-left: 50px;
-    font-size: 18px;
+    font-size: 0px;
 }
 .legend{
     position: absolute;
-    left:800px;
-    top:225px;
+    left:780px;
+    top:220px;
     border: 1px solid black;
-    height: 70px;
-    width: 115px;
+    height: 105px;
+    width: 143px;
 }
-.wrap{
-    height: 10px;
-    margin:auto;
+.msg{
+    width: 950px;
+    position: absolute;
+    font-size: 100px;
+    left:25px;
+    top:400px;
     padding:10px;
+    text-align: center;
 }

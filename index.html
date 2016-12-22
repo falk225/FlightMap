@@ -16,22 +16,16 @@
         d3.json("USAStates.geojson", draw_map);
         //d3.json("world_countries.json", draw_map);
     </script>
-    <p id="main-title">1987 US Flight Traffic</p>
-    <p id="sub-title">Exploring the timing of Arrivals and Departures at US airports</p>
+    <p id="main-title">When do Airports sleep?</p>
+    <p id="sub-title">Exploring the timing of Arrivals and Departures at US airports in 1987</p>
     <p id='description'>-MOUSEOVER an airport for more info </br>
     -CLICK a bar to show flight paths </br>
     -PRESS PLAY to watch a typical day</p>
     <div class='legend'>
-        <div class='wrap'>
-            <div style="background:rgb(31, 28, 219); float:left; width:10px; height:20px;"></div>
-            <text style="float:right;">Departures</text>
-        </div>
-        <div class='wrap'>
-            <div style="background:rgb(224,24,24); float:left; width:10px; height:20px;"></div>
-            <text style="float:right;">Arrivals</text>
-        </div>
-
-    </g>
-
+        <div style="width:100%; height:80px;"></div>
+        <text style="float:left; padding: 5px;">Departures</text>
+        <text style="float:right; padding:5px;">Arrivals</text>
+    </div>
+    <text class='msg'></text>
 </body>
 </html>
