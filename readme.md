@@ -78,3 +78,19 @@ HTML help for legend
     http://stackoverflow.com/questions/15374918/how-to-put-two-div-boxes-side-by-side
 Move object to front or back
     http://bl.ocks.org/eesur/4e0a69d57d3bfc8a82c2
+### Running it (2026 update)
+Live: https://falk225.github.io/FlightMap/
+
+Locally, serve the folder with Python 3.12 and open http://localhost:8000:
+
+    py -3.12 -m http.server 8000        (Windows, or run StartHTTPServerHERE.bat)
+    python3.12 -m http.server 8000      (macOS / Linux)
+
+The 2016 version was ported from D3 v3 to D3 v7 (pinned from jsDelivr over HTTPS) and the
+layout now scales with the window. The look and animations are unchanged.
+
+Tests (Node is only needed for these, not for the site):
+
+    npm install
+    npx playwright install chromium
+    npm test        (type-checks flight_map.js, then runs the Playwright browser tests)

@@ -2,34 +2,36 @@ ellipse{
     fill: none;
     stroke: black;
     stroke-width: 0.7;
-    opacity.7;
+    opacity: .7;
+}
+.page{
+    max-width: 1102px;
+    margin: 0 17px;
+}
+.header{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin: 18px 0 16px;
 }
 .time{
-    position: absolute;
-    left:325px;
     width:225px;
-    top:150px;
+    margin: 0;
 }
 .button {
-    position: absolute;
-    top:172.5px;
     width:50px;
 }
-.button-up{
-    left:700px;
-}
-.button-down{
-    left:650px;
-}
-.play24{
-    left:550px;
+.map-wrap{
+    position: relative;
 }
 .svg-map {
-    position: absolute;
-    left:0px;
-    top:210px;
+    position: relative; /* stacks by DOM order with .msg, so lower() hides it */
+    display: block;
+    width: 100%;
+    height: auto;
+    box-sizing: border-box;
     border: 1px solid black;
-    margin-left: 25px;
 }
 .states{
     fill: #ccc;
@@ -107,21 +109,23 @@ p{
 #description{
     padding-left: 50px;
     font-size: 0px;
+    line-height: 21px;
+    min-height: 63px;
 }
-.legend{
-    position: absolute;
-    left:780px;
-    top:220px;
-    border: 1px solid black;
-    height: 105px;
-    width: 143px;
+.legend rect{
+    fill: none;
+    stroke: black;
+}
+.legend text{
+    font-size: 16px;
 }
 .msg{
-    width: 950px;
     position: absolute;
-    font-size: 100px;
-    left:25px;
-    top:400px;
+    left: 0;
+    right: 0;
+    top: 43%;
+    transform: translateY(-50%);
+    font-size: clamp(36px, 9vw, 100px);
     padding:10px;
     text-align: center;
 }
