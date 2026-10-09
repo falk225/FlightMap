@@ -45,7 +45,7 @@ function startHour(label) {
 
 /** Load the page and stop the 24h autoplay so tests control the hour. */
 async function openStopped(page) {
-    await page.goto('/');
+    await page.goto('./');
     const play = page.locator('button.play24');
     await expect(play).toHaveText('Stop');
     await play.click();

@@ -8,14 +8,17 @@ function withoutDisplay(env) {
     return copy;
 }
 
+// BASE_URL=https://falk225.github.io/FlightMap/ npm run test:e2e  tests the live site
+const liveUrl = process.env.BASE_URL;
+
 module.exports = defineConfig({
     testDir: 'tests',
     timeout: 60000,
     use: {
-        baseURL: 'http://localhost:8123',
+        baseURL: liveUrl || 'http://localhost:8123',
     },
     // the site is static files, served the same way you would run it locally
-    webServer: {
+    webServer: liveUrl ? undefined : {
         command: 'python3.12 -m http.server 8123',
         url: 'http://localhost:8123',
         reuseExistingServer: !process.env.CI,

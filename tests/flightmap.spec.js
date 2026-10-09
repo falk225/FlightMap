@@ -30,7 +30,7 @@ test.describe('page', function () {
 test.describe('playback', function () {
     test('autoplay runs through 24 hours with captions, then shows instructions', async function ({ page }) {
         test.slow();
-        await page.goto('/');
+        await page.goto('./');
         await expect(page.locator('button.play24')).toHaveText('Stop');
         await expect(page.locator('.msg')).toHaveText('Waking up!', { timeout: 5000 });
         await expect(page.locator('.msg')).toHaveText('Work all day.', { timeout: 6000 });

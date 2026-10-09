@@ -94,3 +94,7 @@ Tests (Node is only needed for these, not for the site):
     npm install
     npx playwright install chromium
     npm test        (type-checks flight_map.js, then runs the Playwright browser tests)
+
+To run the browser tests against the live site instead of a local server:
+
+    BASE_URL=https://falk225.github.io/FlightMap/ npm run test:e2e
