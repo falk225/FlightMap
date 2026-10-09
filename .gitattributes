@@ -18,3 +18,6 @@
 
 # Windows batch files need CRLF
 *.bat text eol=crlf
+
+# Running session log; concurrent sessions append
+PROGRESS.md merge=union
