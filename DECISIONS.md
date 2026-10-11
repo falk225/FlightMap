@@ -126,3 +126,76 @@ logs, not proven. If stalls recur, re-check with `DEBUG=pw:browser`.
 
 Related: never wrap `npx playwright test` in `timeout` — killing it orphans the
 `webServer` and leaves port 8123 bound. Use `--global-timeout`.
+
+---
+
+## D005 — Switch this repo to `dev-promote`
+
+**Date:** 2026-10-10
+
+**Context:** GitHub Pages builds the live site from `master`, so every push to `master`
+deploys. The house rule (`~/projects/CLAUDE.md`) requires `dev-promote` as soon as
+something deploys off the main branch. The redesign was going to land in phases, and
+`main-only` would have published each half-finished phase.
+
+**Decision:** Work happens on `dev`. `master` only moves by fast-forward
+(`git merge --ff-only dev`) once a change has been reviewed. The branch stays named
+`master` (renaming it is not part of this).
+
+**Consequences:** Pushing `dev` is safe; promoting to `master` is the publish step.
+
+---
+
+## D006 — Colors follow the clock, with twilight → day as one step
+
+**Date:** 2026-10-10
+
+**Context:** The 2026 redesign (direction "A — Glow", picked from three mockups) changes
+the page colors with the hour shown: night, dawn, day, dusk. The first version blended
+smoothly between twilight and day. The contrast test (every hour, text and secondary text
+against their backgrounds) failed at 7–8 AM and 5–6 PM: a half-way mix of a dark and a
+light palette is a mid-tone, and secondary text fell to 2.6–4.3 : 1 against the 4.5 : 1
+minimum.
+
+**Options considered:**
+- Smooth blend, accept low contrast at four hours
+- Pick the text color per hour by computing contrast (still fails: mid-tones read poorly
+  with both light and dark text)
+- Blend only between the two dark palettes (night → twilight), and make twilight → day a
+  single step between adjacent hours
+
+**Decision:** The third. 4–7 AM blends night into twilight, 8 AM is full day, and dusk
+mirrors it. The 0.8 s CSS fade between hours keeps the change from looking abrupt.
+
+**Why:** Every hour passes the contrast test, and because the page only ever shows whole
+hours, a blend between hours adds nothing that the fade doesn't already give.
+
+---
+
+## D007 — Subtler elastic bounce (period 0.65), revising D002's easing
+
+**Date:** 2026-10-10
+
+**Context:** D002 matched the 2016 bounce exactly (`easeElasticOut.period(0.45)`, peaking
+24% past its target). For the redesign the user chose "subtler bounce"
+over keeping it or dropping it.
+
+**Decision:** `d3.easeElasticOut.period(0.65)`: still elastic, peaking 13% past its target
+(both curves computed from d3-ease's formula; each has one rebound above 1%). Used for hover growth and the hints' end-of-playback nudge. Under
+`prefers-reduced-motion` it becomes linear with zero duration.
+
+---
+
+## D008 — Airport names from OurAirports, checked by position
+
+**Date:** 2026-10-10
+
+**Context:** The flight data has only IATA codes; the new card shows the city. Codes get
+reused and renamed over 40 years.
+
+**Decision:** `airports.json` (code → city, state, name) is built from OurAirports
+(public domain), keeping a match only when it lies within 40 km of the flight data's own
+coordinates for that code. 235 of 238 matched and none were rejected for distance.
+PBI (now listed under a new code), PFN and UCA (both closed) were filled in by hand
+with their 1987 names, after checking their coordinates. A test requires a name for
+every code in the data.

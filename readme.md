@@ -87,7 +87,24 @@ Locally, serve the folder with Python 3.12 and open http://localhost:8000:
     python3.12 -m http.server 8000      (macOS / Linux)
 
 The 2016 version was ported from D3 v3 to D3 v7 (pinned from jsDelivr over HTTPS) and the
-layout now scales with the window. The look and animations are unchanged.
+layout now scales with the window.
+
+The 2026 redesign keeps the same story and interactions, and changes the presentation:
+
+- Colors follow the clock: a dark map at night that brightens through dawn into day and
+  dims again at dusk. Flight paths glow at night.
+- A 24-hour timeline under the map replaces the arrow buttons. Its bars show the whole
+  day's traffic, and you can click any hour. Space plays and pauses; the arrow keys step.
+- The captions ("Waking up!", "Work all day."...) stay up for each part of the day, with a
+  fact taken from the data, and the header counts that hour's departures and arrivals.
+- Hovering an airport shows a card with its city and its whole day; clicking pins it, with
+  buttons for its routes. On phones, tapping opens it as a sheet along the bottom.
+- Dots keep flying along drawn routes, the busiest airports are labelled, and the page
+  respects the system "reduce motion" setting.
+
+Airport names in `airports.json` come from [OurAirports](https://ourairports.com/data/)
+(public domain), matched by code and checked against the flight data's coordinates. PBI,
+PFN and UCA were added by hand: their airports have since closed or changed codes.
 
 Tests (Node is only needed for these, not for the site):
 

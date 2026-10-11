@@ -21,6 +21,7 @@ function loadFlights() {
 }
 
 const flights = loadFlights();
+const airportInfo = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'airports.json'), 'utf8'));
 
 function sumN(rows) {
     return rows.reduce(function (s, d) { return s + d.n; }, 0);
@@ -34,6 +35,19 @@ function arrivals(airport, hour) {
     return flights.filter(function (d) { return d.Dest === airport && d.ArrHour === hour; });
 }
 
+function totalDepartures(hour) {
+    return sumN(flights.filter(function (d) { return d.DepHour === hour; }));
+}
+
+function totalArrivals(hour) {
+    return sumN(flights.filter(function (d) { return d.ArrHour === hour; }));
+}
+
+/** 12345 -> "12,345", as the page formats counts */
+function commas(n) {
+    return n.toLocaleString('en-US');
+}
+
 // "10:00 AM - 11:00 AM" / "12 Noon - 1:00 PM" / "Midnight - 1:00 AM" -> 10 / 12 / 0
 function startHour(label) {
     const first = label.split(' - ')[0];
@@ -43,41 +57,45 @@ function startHour(label) {
     return first.endsWith('PM') ? h + 12 : h;
 }
 
-/** Load the page and stop the 24h autoplay so tests control the hour. */
-async function openStopped(page) {
-    await page.goto('./');
-    const play = page.locator('button.play24');
-    await expect(play).toHaveText('Stop');
-    await play.click();
-    await expect(play).toHaveText('Play 24h');
-}
-
-/** Wait until the caption overlay is behind the map, as it is when idle. */
-async function waitForOverlayLowered(page) {
-    await expect.poll(function () {
-        return page.evaluate(function () {
-            const first = document.querySelector('.map-wrap').firstElementChild;
-            return first.classList.contains('msg');
-        });
-    }).toBe(true);
-}
-
-/** Step the hour arrows until the given hour is showing, then let transitions settle. */
-async function goToHour(page, hour) {
-    const current = startHour(await page.locator('.time').textContent());
-    const steps = (hour - current + 24) % 24;
-    for (let i = 0; i < steps; i++) {
-        await page.locator('button.button-up').click();
-    }
-    await expect(page.locator('.time')).toHaveText(new RegExp('^' + hourLabel(hour)));
-    await waitForOverlayLowered(page);
-    await page.waitForTimeout(700); // bar transitions are 500ms
-}
-
 function hourLabel(hour) {
     if (hour === 12) return '12 Noon';
     if (hour === 0 || hour === 24) return 'Midnight';
     return hour > 12 ? (hour - 12) + ':00 PM' : hour + ':00 AM';
 }
 
-module.exports = { flights, sumN, departures, arrivals, startHour, hourLabel, openStopped, goToHour, waitForOverlayLowered };
+/** Load the page and stop the 24h autoplay so tests control the hour. */
+async function openStopped(page) {
+    await page.goto('./');
+    const play = page.locator('button.play24');
+    await expect(play).toHaveClass(/playing/);
+    await play.click();
+    await expect(play).not.toHaveClass(/playing/);
+}
+
+/** Jump to an hour with the timeline, then let transitions settle. */
+async function goToHour(page, hour) {
+    await page.locator('.hours .hour').nth(hour).click();
+    await expect(page.locator('.time-range')).toHaveText(new RegExp('^' + hourLabel(hour)));
+    await page.waitForTimeout(700); // bar transitions are 500ms
+}
+
+/** WCAG contrast ratio between two CSS colors ("#rrggbb" or "rgb(r, g, b)") */
+function contrast(a, b) {
+    function lum(c) {
+        const m = c.trim().match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+        const rgb = m ? m.slice(1).map(function (x) { return parseInt(x, 16); })
+            : (c.match(/\d+/g) || []).slice(0, 3).map(Number);
+        const lin = rgb.map(function (v) {
+            const s = v / 255;
+            return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+        });
+        return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
+    }
+    const la = lum(a), lb = lum(b);
+    return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+}
+
+module.exports = {
+    flights, airportInfo, sumN, departures, arrivals, totalDepartures, totalArrivals, commas,
+    startHour, hourLabel, openStopped, goToHour, contrast
+};

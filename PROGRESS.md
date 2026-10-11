@@ -2,13 +2,14 @@
 
 ## Status at a Glance
 
-**Last updated:** 2026-10-09 (session 1, checkpoint)
+**Last updated:** 2026-10-10 (session 2, redesign on `dev`)
 
-**Phase:** Revived. The 2016 school project ("When do Airports Sleep?") runs
-again, live at https://falk225.github.io/FlightMap/, on D3 v7 with a
-responsive layout and a test suite. Goal for now: keep the original feel.
+**Phase:** Redesign built and green on `dev`, not yet live. The live site
+(https://falk225.github.io/FlightMap/) is still the session 1 port. Same story and
+interactions, new presentation: direction "A — Glow", chosen from three mockups.
 
-**Branching:** `main-only`, on `master` (repo is on GitHub, not the NAS).
+**Branching:** `dev-promote` since 2026-10-10 (D005): Pages deploys from `master`, so
+work goes on `dev` and `master` only fast-forwards. Repo is on GitHub, not the NAS.
 
 **Recently shipped**
 
@@ -23,9 +24,20 @@ responsive layout and a test suite. Goal for now: keep the original feel.
   all green locally and against the live site
 - GitHub Pages re-enabled from `master` root, HTTPS enforced
 
+**On `dev`, waiting for review → promote to `master`**
+
+- Colors follow the clock: night → dawn → day → dusk (D006)
+- 24-hour timeline with clickable hours and a sparkline; Space / arrow keys
+- Chapter captions with facts computed from the data; animated hour counts
+- Airport card (city, day chart), pinned on click with route buttons; bottom sheet
+  on phones; airport names from OurAirports (D008)
+- Flying dots on routes, glow at night, hub labels, hover focus, subtler bounce (D007)
+- Loading state, reduced-motion support, favicon, link-preview image
+- 39 tests (was 19), including contrast at every hour, touch and reduced motion
+
 **Forthcoming**
 
-- Nothing committed to yet — see Backlog
+- User review of the redesign, then `git merge --ff-only dev` on `master` and push
 
 ---
 
@@ -43,14 +55,14 @@ responsive layout and a test suite. Goal for now: keep the original feel.
 
 - [ ] Run `StartHTTPServerHERE.bat` on Windows — untested (written on Linux;
       needs Python 3.12 installed for `py -3.12`)
-- [ ] Tooltip is placed at `pageX + 40`, so near the right edge on narrow
-      screens it can run off-screen
-- [ ] Touch: hover (tooltip, bar growth) is mouse-oriented; tap behaviour on
-      phones not designed or tested
-- [ ] Readme could note that the 1987 data in the ASA Data Expo set covers
-      only October–December
-- [ ] Original quirk, kept for parity: pressing Stop before the first playback
-      tick (~1.25 s) leaves the map empty until an hour is chosen
+- [x] Tooltip ran off-screen near the right edge (card now flips and is clamped;
+      tested)
+- [x] Touch: tap opens the card as a bottom sheet (tested)
+- [x] Note that the data covers only October–December (page eyebrow and footer)
+- [x] Stopping before the first playback tick left the map empty (5 AM is now
+      drawn at load; tested)
+- [ ] The mockup canvas (claude.ai artifact) used 8 AM data only; the real page is
+      the reference now
 - [ ] Optional: full TypeScript conversion if a build step becomes acceptable
       (D001)
 
@@ -68,6 +80,8 @@ responsive layout and a test suite. Goal for now: keep the original feel.
 
 ### Key files
 
+- `airports.json` — code → city/state/name for the card (D008)
+
 - `flight_map.js` — all visualization logic (D3 v7)
 - `index.html`, `flight_map.css` — page shell and styles
 - `flight_data.csv` — 19,686 route-hour rows (~1.31M flights), 238 airports
@@ -79,6 +93,38 @@ responsive layout and a test suite. Goal for now: keep the original feel.
 ---
 
 ## Session Log (newest first)
+
+### 2026-10-10 — session 2: GitHub email, mockups, redesign
+
+**Done**
+
+- Global git config now uses the GitHub no-reply email for any repo with a github.com
+  remote (`includeIf hasconfig:remote.*.url`); tested against SSH, HTTPS, NAS and
+  remote-less repos.
+- Brainstormed a refresh; user approved all of it except gradient arcs. Built three
+  mockup directions with real map data on a claude.ai design canvas, then added a
+  time-of-day slider to each after the user pointed out the day/night idea had been
+  lost. User picked "A — Glow".
+- Switched to `dev-promote` (D005) and built the redesign on `dev`.
+
+**Verified, not assumed**
+
+- `npm test`: tsc clean, 39/39 Playwright tests pass.
+- New tests proven able to fail: the contrast test failed the first color curve at
+  four hours (fixed, D006); removing the card's edge-flip made the card test fail
+  (card ran 146 px past the map).
+- Overshoot numbers in D007 computed from d3-ease's formula, not estimated.
+
+**Problems hit**
+
+- Timeline sparkline bars rendered with zero width (flex children of a flex `<span>`
+  inside a `<button>`); fixed with an explicit `width: 100%`, now covered by the
+  sparkline test.
+- Hidden hints still reserved their space, leaving a gap under the title on phones;
+  hints are now always visible and nudge when playback ends.
+- A stray `http.server` from the data-extraction script was still bound to 8124; a
+  later server failed to bind silently and the old one served the pages. Same
+  directory, so results were valid; killed it.
 
 ### 2026-10-09 — session 1: revive, port to D3 v7, tests, Pages
 
