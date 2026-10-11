@@ -1,0 +1,131 @@
+ellipse{
+    fill: none;
+    stroke: black;
+    stroke-width: 0.7;
+    opacity: .7;
+}
+.page{
+    max-width: 1102px;
+    margin: 0 17px;
+}
+.header{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin: 18px 0 16px;
+}
+.time{
+    width:225px;
+    margin: 0;
+}
+.button {
+    width:50px;
+}
+.map-wrap{
+    position: relative;
+}
+.svg-map {
+    position: relative; /* stacks by DOM order with .msg, so lower() hides it */
+    display: block;
+    width: 100%;
+    height: auto;
+    box-sizing: border-box;
+    border: 1px solid black;
+}
+.states{
+    fill: #ccc;
+    stroke: #fff;
+    stroke-width:2px;
+}
+.origin_bar {
+    fill: rgb(31, 28, 219);
+    stroke: black;
+    stroke-width:.1;
+    opacity:.7;
+    stroke-opacity: 1;
+}
+.dest_bar {
+    fill: rgb(224, 24, 24);
+    stroke: black;
+    stroke-width:.1;
+    opacity:.7;
+    stroke-opacity: 1;
+}
+.origin_path {
+    fill:none;
+    stroke:rgb(31, 28, 219);
+    stroke-opacity:.7;
+}
+.dest_path {
+    fill:none;
+    stroke:rgb(224, 24, 24);
+    stroke-opacity:.7;
+}
+.origin_marker {
+    fill:rgb(31, 28, 219);
+    opacity:.3;
+}
+.dest_marker {
+    fill:rgb(224, 24, 24);
+    opacity:.3;
+}
+.tooltip {
+    position: absolute;
+    text-align: center;
+    width: 150px;
+    height: 60px;
+    padding: 4px;
+    font: 12px sans-serif;
+    background: #b3b3b3;
+    border: solid #fff;
+    border-radius: 8px;
+    border-width:2px;
+    pointer-events: none;
+    opacity: 0;
+}
+.tooltip-header{
+    height:30px;
+}
+.tooltip-left{
+    float:left;
+}
+.tooltip-right{
+    float: right;
+}
+p{
+    text-align:left;
+    margin: 0px;
+    padding-left: 25px;
+
+}
+#main-title{
+    margin-top: 20px;
+    font-size: 36px;
+}
+#sub-title{
+    font-size: 24px;
+}
+#description{
+    padding-left: 50px;
+    font-size: 0px;
+    line-height: 21px;
+    min-height: 63px;
+}
+.legend rect{
+    fill: none;
+    stroke: black;
+}
+.legend text{
+    font-size: 16px;
+}
+.msg{
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 43%;
+    transform: translateY(-50%);
+    font-size: clamp(36px, 9vw, 100px);
+    padding:10px;
+    text-align: center;
+}

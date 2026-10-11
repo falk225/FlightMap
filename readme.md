@@ -102,6 +102,11 @@ The 2026 redesign keeps the same story and interactions, and changes the present
 - Dots keep flying along drawn routes, the busiest airports are labelled, and the page
   respects the system "reduce motion" setting.
 
+The 2016 design is kept at [/original/](https://falk225.github.io/FlightMap/original/), and a
+switch at the top of both pages flips between them. It is the session 1 port: the 2016 code
+with only the fixes needed to run today (D3 v7, HTTPS, valid CSS, the scale-domain bug,
+responsive sizing), so the comparison shows the design change rather than broken code.
+
 Airport names in `airports.json` come from [OurAirports](https://ourairports.com/data/)
 (public domain), matched by code and checked against the flight data's coordinates. PBI,
 PFN and UCA were added by hand: their airports have since closed or changed codes.

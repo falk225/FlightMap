@@ -199,3 +199,30 @@ coordinates for that code. 235 of 238 matched and none were rejected for distanc
 PBI (now listed under a new code), PFN and UCA (both closed) were filled in by hand
 with their 1987 names, after checking their coordinates. A test requires a name for
 every code in the data.
+
+---
+
+## D009 — Keep the 2016 design at `/original/`, switched by a link
+
+**Date:** 2026-10-10
+
+**Context:** This is a portfolio project, and the user wants to demonstrate the difference
+AI-assisted work made by flipping between the original and the redesign on the live site.
+
+**Options considered:**
+- Both apps in one page with a toggle that swaps them in place
+- The original as its own page at `/original/`, with a two-way switch on both pages
+
+**Decision:** Separate page. `original/` holds the app files from commit `dbf4b5a` (the
+session 1 port: 2016 code made to run, not redesigned), changed only to load the shared
+data from `../` and to add the switch. Its 19 session 1 tests run against it unchanged
+apart from the URL and title.
+
+**Why:** Both apps are a single `draw_map` closure with page-level state (a global
+function name, `document` listeners, the `.tooltip` element), so sharing one page would
+mean editing the original — which would undermine it as the "before" picture. A link is
+also simplest to explain in a demo.
+
+**Consequences:** The original is the *ported* 2016 code, not the byte-for-byte 2016 files
+(those can't run on HTTPS: D3 v3 over `http://`). The readme says so. `tsc` checks only the
+redesign; the original passed the same check at `dbf4b5a`.

@@ -412,3 +412,19 @@ test.describe('layout', function () {
         });
     }
 });
+
+test.describe('version toggle', function () {
+    test('switches between the redesign and the 2016 original', async function ({ page }) {
+        await page.goto('./');
+        const toggle = page.locator('nav.version-toggle');
+        await expect(toggle.locator('[aria-current="page"]')).toHaveText('2026 AI-upgraded');
+        await toggle.getByText('2016 original').click();
+        await expect(page).toHaveURL(/\/original\/$/);
+        await expect(page).toHaveTitle('Flight Map from 1987 (2016 original)');
+        await expect(page.locator('rect.origin_bar').first()).toBeAttached({ timeout: 5000 });
+        await expect(page.locator('nav.version-toggle [aria-current="page"]')).toHaveText('2016 original');
+        await page.locator('nav.version-toggle').getByText('2026 AI-upgraded').click();
+        await expect(page.locator('.time-range')).not.toBeEmpty();
+        await expect(page).toHaveTitle('Flight Map from 1987');
+    });
+});

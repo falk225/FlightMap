@@ -33,7 +33,9 @@ work goes on `dev` and `master` only fast-forwards. Repo is on GitHub, not the N
   on phones; airport names from OurAirports (D008)
 - Flying dots on routes, glow at night, hub labels, hover focus, subtler bounce (D007)
 - Loading state, reduced-motion support, favicon, link-preview image
-- 39 tests (was 19), including contrast at every hour, touch and reduced motion
+- 40 tests (was 19), including contrast at every hour, touch and reduced motion
+- The 2016 design kept at `/original/` with a 2016 / 2026 switch on both pages (D009);
+  its 19 session 1 tests still run against it (60 tests total)
 
 **Forthcoming**
 
@@ -81,6 +83,8 @@ work goes on `dev` and `master` only fast-forwards. Repo is on GitHub, not the N
 ### Key files
 
 - `airports.json` — code → city/state/name for the card (D008)
+- `original/` — the 2016 design, for comparison (D009); shares the root data files
+- `version-toggle.css` — the 2016 / 2026 switch, used by both pages
 
 - `flight_map.js` — all visualization logic (D3 v7)
 - `index.html`, `flight_map.css` — page shell and styles
