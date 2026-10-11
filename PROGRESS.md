@@ -2,11 +2,11 @@
 
 ## Status at a Glance
 
-**Last updated:** 2026-10-10 (session 2, redesign on `dev`)
+**Last updated:** 2026-10-10 (session 2, redesign live)
 
-**Phase:** Redesign built and green on `dev`, not yet live. The live site
-(https://falk225.github.io/FlightMap/) is still the session 1 port. Same story and
-interactions, new presentation: direction "A — Glow", chosen from three mockups.
+**Phase:** Redesign live at https://falk225.github.io/FlightMap/, with the 2016 design at
+/original/ and a switch between them. Same story and interactions, new presentation:
+direction "A — Glow", chosen from three mockups. 60/60 tests pass against the live site.
 
 **Branching:** `dev-promote` since 2026-10-10 (D005): Pages deploys from `master`, so
 work goes on `dev` and `master` only fast-forwards. Repo is on GitHub, not the NAS.
@@ -24,7 +24,7 @@ work goes on `dev` and `master` only fast-forwards. Repo is on GitHub, not the N
   all green locally and against the live site
 - GitHub Pages re-enabled from `master` root, HTTPS enforced
 
-**On `dev`, waiting for review → promote to `master`**
+**Live since 2026-10-10 (`bad5b06`)**
 
 - Colors follow the clock: night → dawn → day → dusk (D006)
 - 24-hour timeline with clickable hours and a sparkline; Space / arrow keys
@@ -39,7 +39,7 @@ work goes on `dev` and `master` only fast-forwards. Repo is on GitHub, not the N
 
 **Forthcoming**
 
-- User review of the redesign, then `git merge --ff-only dev` on `master` and push
+- Nothing committed to yet — see Backlog
 
 ---
 
