@@ -229,6 +229,8 @@ function draw_map(geo_data) {
             bars_g.selectAll('rect').classed('focus', function(d){
                 return want.has(/** @type {any} */ (d).key);
             });
+            //grown bars overlap their neighbors, so draw them last or a neighbor takes the click
+            bars_g.selectAll('rect.focus').raise();
         }
 
         function hover(event, airport_code){

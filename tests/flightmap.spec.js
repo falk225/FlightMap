@@ -241,6 +241,17 @@ test.describe('flight paths', function () {
         await expect(page.locator('g.flight_paths')).toHaveCount(0);
     });
 
+    test('a grown bar can be clicked again even where neighbors overlap it', async function ({ page }) {
+        // regression: at 7 PM ORD's grown bar sat under ATW's, which took the second click
+        await openStopped(page);
+        await goToHour(page, 19);
+        await page.locator('rect.origin_bar.ORD').click();
+        await expect(page.locator('g.flight_paths.origin.ORD')).toHaveCount(1);
+        await page.waitForTimeout(700); // let the bar finish growing
+        await page.locator('rect.origin_bar.ORD').click();
+        await expect(page.locator('g.flight_paths')).toHaveCount(0);
+    });
+
     test('clicking an arrival bar draws arrival arcs', async function ({ page }) {
         await openStopped(page);
         await goToHour(page, 18);
