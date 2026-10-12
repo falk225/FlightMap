@@ -226,3 +226,21 @@ also simplest to explain in a demo.
 **Consequences:** The original is the *ported* 2016 code, not the byte-for-byte 2016 files
 (those can't run on HTTPS: D3 v3 over `http://`). The readme says so. `tsc` checks only the
 redesign; the original passed the same check at `dbf4b5a`.
+
+---
+
+## D010 — Airport card uses the page theme, not the inverse
+
+**Date:** 2026-10-12
+
+**Context:** The card was drawn in the opposite theme (light card at night, dark by day),
+so it never matched the chapter caption. The user asked for both cards to be on theme.
+
+**Decision:** The card uses the same surface and text colors as the caption (`--panel`,
+`--text`, `--muted`). Its departure/arrival numbers use new `--dep-ink`/`--arr-ink`
+colors: the same as the bar colors except by day, where the bar orange is only about
+3 : 1 on white, so the numbers use a darker orange (#A85400). The contrast test checks
+both against `--panel` at every hour.
+
+Also from this request: Denver's departure and arrival routes are drawn at load, so
+flights are moving from the first frame.

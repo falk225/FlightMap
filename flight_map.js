@@ -43,20 +43,18 @@ function draw_map(geo_data) {
     var PALETTE = {
         night: {'bg':'#070B18', 'panel':'#0F1630', 'chip':'#1C2647', 'map':'#0B1226', 'land':'#18213D',
                 'dep':'#5AB8FF', 'arr':'#FFC24D', 'dot':'#DCF0FF',
-                'card':'#F4F6FB', 'card-dep':'#1A5FB4', 'card-arr':'#9A5B00'},
+                'dep-ink':'#5AB8FF', 'arr-ink':'#FFC24D'},
         twilight: {'bg':'#2A2550', 'panel':'#38316A', 'chip':'#4A4282', 'map':'#332C61', 'land':'#4B437E',
                 'dep':'#7CCBFF', 'arr':'#FFB46B', 'dot':'#FFFFFF',
-                'card':'#F7F2FB', 'card-dep':'#1A5FB4', 'card-arr':'#9A5B00'},
+                'dep-ink':'#7CCBFF', 'arr-ink':'#FFB46B'},
         day: {'bg':'#EAF1F8', 'panel':'#FFFFFF', 'chip':'#DCE6F2', 'map':'#D3E2F1', 'land':'#F9FBFE',
                 'dep':'#1D5BD8', 'arr':'#D9720B', 'dot':'#0E3A8F',
-                'card':'#0F1630', 'card-dep':'#7CC2FF', 'card-arr':'#FFC24D'}
+                'dep-ink':'#1D5BD8', 'arr-ink':'#A85400'}
     };
     //text flips between light and dark rather than blending, so it stays readable
     var INK = {
-        on_dark: {'text':'#E7EAF3', 'muted':'#A9B1CB',
-                'card-text':'#0B1226', 'card-muted':'#46506B', 'card-rule':'#DDE2EE'},
-        on_light: {'text':'#0B1226', 'muted':'#46506B',
-                'card-text':'#E7EAF3', 'card-muted':'#A9B1CB', 'card-rule':'#2A3558'}
+        on_dark: {'text':'#E7EAF3', 'muted':'#A9B1CB'},
+        on_light: {'text':'#0B1226', 'muted':'#46506B'}
     };
 
     //0 at night (9 PM - 4 AM), 1 in the day (9 AM - 4 PM), ramping through dawn and dusk
@@ -1028,6 +1026,11 @@ function draw_map(geo_data) {
 
         //begins by showing the first hour and playing through the rest of the day, then lets them explore
         change_hour(0);
+        //Denver's departures and arrivals start switched on, so flights are moving from the first
+        //frame; they follow the hour like any other shown routes and click off the same way
+        var default_airport = 'DEN';
+        draw_flight_paths(flight_data_on_map, true, default_airport, currentHour);
+        draw_flight_paths(flight_data_on_map, false, default_airport, currentHour);
         play(23);
     }
 

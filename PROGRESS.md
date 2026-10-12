@@ -2,7 +2,7 @@
 
 ## Status at a Glance
 
-**Last updated:** 2026-10-10 (session 2, redesign live)
+**Last updated:** 2026-10-12 (session 2, card on theme, Denver routes by default)
 
 **Phase:** Redesign live at https://falk225.github.io/FlightMap/, with the 2016 design at
 /original/ and a switch between them. Same story and interactions, new presentation:
@@ -97,6 +97,17 @@ work goes on `dev` and `master` only fast-forwards. Repo is on GitHub, not the N
 ---
 
 ## Session Log (newest first)
+
+### 2026-10-12 — session 2 (continued): card on theme, Denver by default
+
+- Airport card now uses the page theme like the caption (D010); Denver's departures and
+  arrivals are drawn at load.
+- Found the reduced-motion test had never run with reduced motion on: Playwright 1.48
+  silently ignores a top-level `reducedMotion` in `test.use`, and the test only passed
+  because it checked before any dots had appeared. Now uses `contextOptions`, asserts the
+  media query matches first, and was shown to fail when the reduced-motion check is
+  removed from the app.
+- 62/62 tests pass locally.
 
 ### 2026-10-10 — session 2: GitHub email, mockups, redesign
 

@@ -155,10 +155,12 @@ test.describe('day and night', function () {
                 const s = getComputedStyle(document.documentElement);
                 const get = function (n) { return s.getPropertyValue(n).trim(); };
                 return { hour: document.querySelector('.time-range').textContent, bg: get('--bg'), panel: get('--panel'),
-                    text: get('--text'), muted: get('--muted'), card: get('--card'), cardText: get('--card-text'), cardMuted: get('--card-muted') };
+                    text: get('--text'), muted: get('--muted'), depInk: get('--dep-ink'), arrInk: get('--arr-ink') };
             });
-            for (const [fg, bg, label] of [[v.text, v.bg, 'text'], [v.muted, v.bg, 'muted'], [v.muted, v.panel, 'muted on panel'],
-                [v.cardText, v.card, 'card text'], [v.cardMuted, v.card, 'card muted']]) {
+            // the caption and the airport card are both drawn on --panel
+            for (const [fg, bg, label] of [[v.text, v.bg, 'text'], [v.muted, v.bg, 'muted'],
+                [v.text, v.panel, 'text on panel'], [v.muted, v.panel, 'muted on panel'],
+                [v.depInk, v.panel, 'departure numbers'], [v.arrInk, v.panel, 'arrival numbers']]) {
                 const ratio = contrast(fg, bg);
                 if (ratio < 4.5) failures.push(v.hour + ' ' + label + ' ' + ratio.toFixed(2));
             }
@@ -231,6 +233,18 @@ test.describe('data', function () {
 });
 
 test.describe('flight paths', function () {
+    test('Denver\'s departures and arrivals are drawn from the start and follow the hour', async function ({ page }) {
+        await openStopped(page);
+        await expect(page.locator('g.flight_paths')).toHaveCount(2);
+        await goToHour(page, 10);
+        await expect(page.locator('g.flight_paths.origin.DEN path.origin_path')).toHaveCount(departures('DEN', 10).length);
+        await expect(page.locator('g.flight_paths.dest.DEN path.dest_path')).toHaveCount(arrivals('DEN', 10).length);
+        await expect(page.locator('g.flight_paths.origin.DEN circle.flight_dot')).toHaveCount(departures('DEN', 10).length, { timeout: 3000 });
+        await page.locator('rect.origin_bar.DEN').click();
+        await expect(page.locator('g.flight_paths.origin.DEN')).toHaveCount(0);
+        await expect(page.locator('g.flight_paths.dest.DEN')).toHaveCount(1);
+    });
+
     test('clicking a departure bar draws one arc per route; clicking again removes them', async function ({ page }) {
         await openStopped(page);
         await goToHour(page, 10);
@@ -238,7 +252,7 @@ test.describe('flight paths', function () {
         await page.locator('rect.origin_bar.ATL').click();
         await expect(page.locator('g.flight_paths.origin.ATL path.origin_path')).toHaveCount(departures('ATL', 10).length);
         await page.locator('rect.origin_bar.ATL').click();
-        await expect(page.locator('g.flight_paths')).toHaveCount(0);
+        await expect(page.locator('g.flight_paths.ATL')).toHaveCount(0);
     });
 
     test('a grown bar can be clicked again even where neighbors overlap it', async function ({ page }) {
@@ -249,7 +263,7 @@ test.describe('flight paths', function () {
         await expect(page.locator('g.flight_paths.origin.ORD')).toHaveCount(1);
         await page.waitForTimeout(700); // let the bar finish growing
         await page.locator('rect.origin_bar.ORD').click();
-        await expect(page.locator('g.flight_paths')).toHaveCount(0);
+        await expect(page.locator('g.flight_paths.ORD')).toHaveCount(0);
     });
 
     test('clicking an arrival bar draws arrival arcs', async function ({ page }) {
@@ -292,12 +306,31 @@ test.describe('flight paths', function () {
         await goToHour(page, 10);
         await page.locator('rect.origin_bar.ATL').click();
         const n = departures('ATL', 10).length;
-        await expect(page.locator('circle.flight_dot')).toHaveCount(n, { timeout: 3000 });
-        await expect(page.locator('circle.flight_dot animateMotion')).toHaveCount(n);
+        const atl = page.locator('g.flight_paths.origin.ATL');
+        await expect(atl.locator('circle.flight_dot')).toHaveCount(n, { timeout: 3000 });
+        await expect(atl.locator('circle.flight_dot animateMotion')).toHaveCount(n);
     });
 });
 
 test.describe('airport card', function () {
+    test('uses the same theme colors as the caption, by day and by night', async function ({ page }) {
+        await openStopped(page);
+        for (const hour of [2, 13]) {
+            await goToHour(page, hour);
+            await page.locator('ellipse.airport.DEN').hover({ force: true });
+            await expect(page.locator('.card')).toHaveClass(/visible/);
+            await page.waitForTimeout(900); // theme colors fade over 0.8s
+            const colors = await page.evaluate(function () {
+                const card = getComputedStyle(document.querySelector('.card'));
+                const caption = getComputedStyle(document.querySelector('.caption'));
+                return { card: card.backgroundColor, caption: caption.backgroundColor, cardText: card.color, pageText: getComputedStyle(document.body).color };
+            });
+            expect(colors.card).toBe(colors.caption);
+            expect(colors.cardText).toBe(colors.pageText);
+            await page.mouse.move(5, 5);
+        }
+    });
+
     test('stays inside the map next to the right edge', async function ({ page }) {
         await openStopped(page);
         await goToHour(page, 10);
@@ -361,14 +394,16 @@ test.describe('touch', function () {
 });
 
 test.describe('reduced motion', function () {
-    test.use({ reducedMotion: 'reduce' });
+    // a top-level `reducedMotion` option is silently ignored by this Playwright version
+    test.use({ contextOptions: { reducedMotion: 'reduce' } });
 
     test('skips the flying dots and still works', async function ({ page }) {
         await openStopped(page);
+        expect(await page.evaluate(function () { return matchMedia('(prefers-reduced-motion: reduce)').matches; })).toBe(true);
         await goToHour(page, 10);
         await page.locator('rect.origin_bar.ATL').click();
         await expect(page.locator('g.flight_paths.origin.ATL path.origin_path')).toHaveCount(departures('ATL', 10).length);
-        await page.waitForTimeout(300);
+        await page.waitForTimeout(1500); // with motion on, dots appear once the 1s draw-in ends
         await expect(page.locator('circle.flight_dot')).toHaveCount(0);
         await expect(page.locator('.count-dep')).toHaveText(commas(totalDepartures(10)));
     });
